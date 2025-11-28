@@ -1,0 +1,30 @@
+name: Hourly Weather Logger
+
+on:
+  schedule:
+    # 每小时的第0分钟运行一次 (cron 语法)
+    - cron: '0 * * * *'
+  workflow_dispatch: # 允许手动点击按钮触发测试
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          pip install requests supabase
+
+      - name: Run collector script
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          CAIYUN_TOKEN: ${{ secrets.CAIYUN_TOKEN }}
+        run: python collect_data.py
