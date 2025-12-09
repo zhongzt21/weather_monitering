@@ -159,32 +159,4 @@ elif page == "🛠️ 系统诊断":
             st.error(f"❌ 写入失败: {e}")
             st.write("如果是 'Column not found'，请检查你导入历史数据时是否改了列名。")
 
-st.divider()
-st.error("🛑 绝望调试区")
 
-if st.button("💣 连通性核爆测试"):
-    # 1. 打印配置信息 (只显示前几位，防止泄露)
-    url = st.secrets["SUPABASE_URL"]
-    key = st.secrets["SUPABASE_KEY"]
-    st.write(f"正在使用的 URL: {url[:20]}...")
-    st.write(f"正在使用的 KEY: {key[:10]}...")
-    
-    try:
-        client = create_client(url, key)
-        
-        # 2. 尝试列出所有监测点 (monitor_config 通常数据少，容易成功)
-        st.write("尝试读取 monitor_config 表...")
-        res = client.table("monitor_config").select("*", count="exact").execute()
-        st.write(f"monitor_config 返回: {res.data}")
-        
-        # 3. 尝试读取 weather_logs
-        st.write("尝试读取 weather_logs 表...")
-        res2 = client.table("weather_logs").select("*").limit(1).execute()
-        st.write(f"weather_logs 返回: {res2.data}")
-        
-        if not res2.data:
-            st.warning("连上了，但是 weather_logs 返回了空列表。")
-            st.warning("可能性：1. 表里真没数据。 2. 表名拼写错误。")
-            
-    except Exception as e:
-        st.error(f"直接报错: {e}")
